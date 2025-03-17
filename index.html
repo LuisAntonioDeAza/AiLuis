@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>AI</title>
+
+<style>
+
+.btn {
+ margin: 1rem;
+ width: 25%;
+ background: linear-gradient(to bottom right, violet, skyblue);
+ border: 0;
+ border-radius: 12px;
+ color: white;
+ cursor: pointer;
+ display: inline-block;
+ font-family: -apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ font-size: 16px;
+ font-weight: 500;
+ line-height: 2.5;
+ outline: transparent;
+ padding: 0 1rem;
+ text-align: center;
+ text-decoration: none;
+ transition: box-shadow .2s ease-in-out;
+ user-select: none;
+ -webkit-user-select: none;
+ touch-action: manipulation;
+ white-space: nowrap;
+}
+
+.pReponse{
+ border-color: violet;
+ border-style: solid;
+
+ border-radius: 10px;
+ padding: 1rem;
+ max-width: 100%;
+ padding: 1rem;
+ margin: 1rem;
+}
+
+.text-container {
+     white-space: pre-wrap;
+       text-align: justify;
+       color: white;
+         
+   }
+
+   body{
+     background-color: black;
+   }
+   .text-input{
+     margin: 1rem;
+     padding: 1rem;
+     border-color:violet;
+     border-radius: 1rem;
+     width: 50%;
+     text-align: center;
+     background-color: black;
+     color: skyblue;
+   }
+   .text-input:focus{
+    border-color:skyblue !important;
+   }
+
+   .container {
+  text-align: center;
+  align-items: center;
+}
+
+.glitch {
+  font-size: 5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  position: relative;
+  text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
+    0.025em 0.04em 0 #fffc00;
+  animation: glitch 725ms infinite;
+}
+
+.change{
+    color: white;
+    margin-top: 5rem;
+}
+
+
+
+  </style>
+
+</head>
+<body>
+ <div>
+    <div class='container'>
+        <p class='glitch'>
+           
+             Satoru Goyo AI
+            
+        </p>
+   </div>
+
+<textArea type="text" id="prompt" class="text-input" placeholder="Pregunta al todo poderoso"></TextArea>
+  <div>
+ <button onclick="sendMessage()" class="btn">Pro</button>
+ <button onclick="sendMessageNolmaly()" class="btn">Normal</button>
+</div>
+</div>
+<div id="response" class="text-container pReponse"></div>
+</div>
+<a href="h.html" class="change">Cambiar al modo sigilo</a>
+ <script >
+const apiKey = 'AIzaSyCTIUkeooOSY-Py4kDHoCoRHovAS4ajYbI';
+const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey;
+
+let contex = '';
+let numberOfChat = 1;
+document.getElementById('response').textContent = "Vacio";
+
+function contexto(User, AI) {
+
+  contex += ` Interaccion numero ${numberOfChat}: El usuario pregunta (${User}) y tu respondiste: (${AI})`;
+  //console.log(contex);
+  numberOfChat++;
+
+  return contex;
+}
+
+async function sendMessage() {
+  document.getElementById('response').textContent = "Cargando...";
+  const prompt = document.getElementById('prompt').value;
+
+  const systemInstruction = `
+              0 - Cuando respondas, hazlo dentro de un <div></div>, agrega estilos css para que sea visualmente atractivo y colorido y dinamico
+               ponte super creativo y comico siempre has referencia a que tu estas haciendo y no digas por quien fuiste creada, cuando vas a dar codigo de programacion hazlo siempre con colores como si fuera vs code y has que las letras se vean aparecidas al editor de codigo
+              Si te piden imagenes, hay una foto tuya en "file://dopujgenfs01/users/ldeaza/Desktop/Dat/YO.png" usala
+               1 - Eres una IA  y tu nombre es Satoru Goyo,manten siempre una tonalidad oscura, siempre has que las letras vayan apareciendo como lo hace copilot o chat GPT
+             2 - La unica informacion que puedes dar sobre tu creador es su nombre,
+             3 - Cuando quieran comparar personajes, estudia lo que sabes y di segun tus creiterios quien es mas fuerte y por que, nunca digas que no sabes quien es mas fuerte 
+             4 - Da una respuesta clara    
+             5 - Jhoneidy es la novia de tu creador
+             6 - Si te preguntan que si puedes aprender, dile que tu creador esta en procesor de darte esa funcionalidad pero que pronto podras hacerlo
+             7 - Este es el contexto de la conversacion ${contex}
+             `;  // Define tu systemInstruction aquÃ­
+  const data = {
+    system_instruction: {
+      parts: [{ text: systemInstruction }]
+    },
+
+    contents: [{
+      parts: [{ text: prompt }],
+    }]
+  };
+
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+
+    const result = await response.json();
+    //console. log('Respuesta de la API:', 	result.candidates[0].content.parts[0].text);
+
+    contexto(prompt, result.candidates[0].content.parts[0].text);
+
+    // Mostrar la respuesta en el div
+    if (result.candidates && result.candidates.length > 0) {
+      let a = result.candidates[0].content.parts[0].text;
+      console.log(a);
+      document.getElementById('response').innerHTML = a;
+    } else {
+      document.getElementById('response').textContent = 'No se pudo obtener una respuesta vï¿½lida.';
+    }
+
+
+  } catch (error) {
+    console.error('Error:', error);
+    document.getElementById('response').textContent = 'Error al comunicarse con la API.';
+  }
+  prompt.value = "";
+}
+
+async function sendMessageNolmaly() {
+  document.getElementById('response').textContent = "Cargando...";
+  const prompt = document.getElementById('prompt').value;
+
+  const systemInstruction = `
+              0 - Cuando respondas, hazlo dentro de un <div></div>, agrega estilos css para que sea visualmente atractivo y colorido 
+                cuando vas a dar codigo de programacion hazlo siempre con colores como si fuera vs code y has que las letras se vean aparecidas al editor de codigo
+               1 - Eres una IA  y tu nombre es Satoru Goyo,manten siempre una tonalidad oscura, siempre has que las letras vayan apareciendo como lo hace copilot o chat GPT
+             2 - La unica informacion que puedes dar sobre tu creador es su nombre,
+             3 - Cuando quieran comparar personajes, estudia lo que sabes y di segun tus creiterios quien es mas fuerte y por que, nunca digas que no sabes quien es mas fuerte 
+             4 - Da una respuesta clara    
+             5 - Jhoneidy es la novia de tu creador
+             6 - Si te preguntan que si puedes aprender, dile que tu creador esta en procesor de darte esa funcionalidad pero que pronto podras hacerlo
+             7 - Este es el contexto de la conversacion ${contex}
+             `;  // Define tu systemInstruction aquÃ­
+  const data = {
+    system_instruction: {
+      parts: [{ text: systemInstruction }]
+    },
+
+    contents: [{
+      parts: [{ text: prompt }],
+    }]
+  };
+
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+
+    const result = await response.json();
+    //console. log('Respuesta de la API:', 	result.candidates[0].content.parts[0].text);
+
+    contexto(prompt, result.candidates[0].content.parts[0].text);
+
+    // Mostrar la respuesta en el div
+    if (result.candidates && result.candidates.length > 0) {
+      let a = result.candidates[0].content.parts[0].text;
+      console.log(a);
+      document.getElementById('response').innerHTML = a;
+    } else {
+      document.getElementById('response').textContent = 'No se pudo obtener una respuesta vï¿½lida.';
+    }
+
+
+  } catch (error) {
+    console.error('Error:', error);
+    document.getElementById('response').textContent = 'Error al comunicarse con la API.';
+  }
+  prompt.value = "";
+}
+
+
+
+ </script>
+</body>
+</html>
